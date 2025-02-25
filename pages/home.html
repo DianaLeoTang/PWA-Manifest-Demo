@@ -1,0 +1,102 @@
+<!--
+ * @Author: Diana Tang
+ * @Date: 2025-02-25 15:04:17
+ * @LastEditors: Diana Tang
+ * @Description: some description
+ * @FilePath: /tangCode/PWA-Manifest-Demo/pages/home.html
+-->
+<div class="card">
+    <h1 class="card-title">欢迎使用原生PWA</h1>
+    <p>这是一个使用原生Web技术构建的渐进式Web应用示例。</p>
+    <p>PWA特性演示：</p>
+    <ul>
+      <li>✅ 可安装到主屏幕</li>
+      <li>✅ 离线工作能力</li>
+      <li>✅ 后台同步</li>
+      <li>✅ 推送通知</li>
+      <li>✅ 响应式设计</li>
+    </ul>
+    
+    <div class="form-demo">
+      <h2>离线表单演示</h2>
+      <p>尝试在离线状态下提交此表单，数据将在恢复连接后自动同步。</p>
+      
+      <form id="demo-form">
+        <div class="form-group">
+          <label class="form-label" for="name">姓名</label>
+          <input type="text" id="name" class="form-input" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="email">邮箱</label>
+          <input type="email" id="email" class="form-input" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="message">留言</label>
+          <textarea id="message" class="form-input" rows="4" required></textarea>
+        </div>
+        
+        <button type="submit">提交</button>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+  // 初始化首页功能
+  function initHomePage() {
+    const demoForm = document.getElementById('demo-form');
+    
+    demoForm.addEventListener('submit', event => {
+      event.preventDefault();
+      
+      // 获取表单数据
+      const formData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        message: document.getElementById('message').value,
+        timestamp: new Date().toISOString()
+      };
+      
+      // 检查是否在线
+      if (navigator.onLine) {
+        // 在线状态 - 直接提交
+        fetch('/api/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('提交失败');
+          }
+          return response.json();
+        })
+        .then(data => {
+          app.showToast('表单提交成功', 'success');
+          demoForm.reset();
+        })
+        .catch(error => {
+          console.error('提交表单错误:', error);
+          app.showToast('提交失败，将保存到离线存储', 'error');
+          
+          // 存储到IndexedDB
+          syncManager.storeFormData(formData);
+        });
+      } else {
+        // 离线状态 - 存储到IndexedDB
+        syncManager.storeFormData(formData)
+          .then(() => {
+            app.showToast('表单已保存，将在网络恢复后同步', 'info');
+            demoForm.reset();
+          })
+          .catch(error => {
+            console.error('存储表单数据错误:', error);
+            app.showToast('保存表单失败', 'error');
+          });
+      }
+    });
+  }
+  </script>
