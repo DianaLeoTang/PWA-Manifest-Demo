@@ -92,6 +92,77 @@ PWA-Manifest-Demo/
    ```
    
    PWA需要HTTPS环境才能完全运行（localhost除外）。
+   `cert.pem` 是一个需要你自己生成的SSL证书文件，用于在本地开发环境中启用HTTPS。这个文件并不是项目本身自带的。
+
+要使用 http-server 并启用 HTTPS，你需要先生成自签名证书。以下是生成证书的步骤：
+
+### 方法一：使用 OpenSSL（推荐）
+
+如果你的系统上安装了 OpenSSL，可以使用以下命令生成证书：
+
+```bash
+openssl req -newkey rsa:2048 -new -nodes -x509 -days 365 -keyout key.pem -out cert.pem
+```
+
+这会生成两个文件：
+- `key.pem`：私钥
+- `cert.pem`：证书
+
+### 方法二：使用 mkcert 工具
+
+1. 安装 mkcert（一个简化本地证书创建的工具）
+   
+   - MacOS：`brew install mkcert`
+   - Windows：`choco install mkcert` 或通过 scoop 安装
+   - Linux：根据发行版使用相应包管理器
+
+2. 安装本地 CA 并创建证书：
+   ```bash
+   mkcert -install
+   mkcert localhost 127.0.0.1 ::1
+   ```
+
+3. 将生成的证书重命名：
+   ```bash
+   mv localhost+2.pem cert.pem
+   mv localhost+2-key.pem key.pem
+   ```
+
+### 启动 http-server 的正确命令
+
+生成证书后，用这个命令启动服务器：
+
+```bash
+http-server -S -C cert.pem -K key.pem
+```
+
+注意 `-K` 参数指定私钥文件。
+
+### 更简单的替代方案
+
+如果你不想处理证书问题，以下是一些更简单的替代方案：
+
+1. **使用 localhost**：在本地开发时，现代浏览器允许在 localhost 域名下测试 PWA 功能而无需 HTTPS
+
+   ```bash
+   http-server
+   ```
+
+2. **使用带内置 HTTPS 的开发服务器**：
+
+   使用 Parcel：
+   ```bash
+   npm install -g parcel
+   parcel index.html
+   ```
+
+   或使用 vite：
+   ```bash
+   npm install -g vite
+   vite
+   ```
+
+这些工具会自动处理开发环境中的 HTTPS 证书问题。
 
 3. **构建生产版本**
    
