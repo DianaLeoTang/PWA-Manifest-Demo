@@ -1,0 +1,100 @@
+<!--
+ * @Author: Diana Tang
+ * @Date: 2025-02-25 14:52:51
+ * @LastEditors: Diana Tang
+ * @Description: some description
+ * @FilePath: /tangCode/PWA-Manifest-Demo/index.html
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4285f4">
+  <meta name="description" content="一个原生技术实现的PWA示例">
+  <title>原生PWA示例</title>
+  
+  <!-- PWA相关链接 -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/images/icon-192x192.png">
+  
+  <!-- 预加载关键资源 -->
+  <link rel="preload" href="/styles/shell.css" as="style">
+  <link rel="preload" href="/scripts/app.js" as="script">
+  
+  <!-- 样式 -->
+  <link rel="stylesheet" href="/styles/shell.css">
+  <link rel="stylesheet" href="/styles/main.css">
+  
+  <!-- iOS特定设置 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="原生PWA">
+  <link rel="apple-touch-startup-image" href="/images/splash-screen.png">
+</head>
+<body>
+  <!-- App Shell -->
+  <header class="app-header">
+    <div class="menu-button" aria-label="菜单" role="button" tabindex="0">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+      </svg>
+    </div>
+    
+    <h1 class="app-title">原生PWA</h1>
+    
+    <div class="app-actions">
+      <button id="install-button" style="display:none;">安装应用</button>
+      <button id="sync-button">同步数据</button>
+      <button id="notification-button">启用通知</button>
+    </div>
+  </header>
+  
+  <!-- 侧边导航 -->
+  <nav class="side-nav">
+    <div class="nav-item active" data-page="home">首页</div>
+    <div class="nav-item" data-page="about">关于</div>
+    <div class="nav-item" data-page="settings">设置</div>
+  </nav>
+  
+  <!-- 离线提醒 -->
+  <div id="offline-notification" class="status-bar" style="display:none;">
+    您当前处于离线状态，部分功能可能不可用
+  </div>
+  
+  <!-- 新版本提醒 -->
+  <div id="update-notification" class="status-bar" style="display:none;">
+    <span>新版本可用</span>
+    <button id="update-button">更新</button>
+  </div>
+  
+  <!-- 主内容区域 -->
+  <main id="content">
+    <div class="loader">加载中...</div>
+  </main>
+  
+  <!-- 页脚 -->
+  <footer class="app-footer">
+    <p>© 2025 原生PWA示例</p>
+  </footer>
+  
+  <!-- 脚本 -->
+  <script src="/scripts/idb.js"></script>
+  <script src="/scripts/sync-manager.js"></script>
+  <script src="/scripts/app.js"></script>
+  <script>
+    // 注册Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('SW注册成功:', registration.scope);
+          })
+          .catch(error => {
+            console.error('SW注册失败:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
