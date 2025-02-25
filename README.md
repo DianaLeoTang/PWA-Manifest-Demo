@@ -16,7 +16,7 @@
 ## 项目结构
 
 ```
-native-pwa/
+PWA-Manifest-Demo/
 ├── index.html                # 主页面
 ├── offline.html              # 离线页面
 ├── manifest.json             # Web App Manifest
@@ -79,8 +79,8 @@ native-pwa/
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/yourusername/native-pwa.git
-   cd native-pwa
+   git clone https://github.com/yourusername/PWA-Manifest-Demo.git
+   cd PWA-Manifest-Demo
    ```
 
 2. **本地开发**
