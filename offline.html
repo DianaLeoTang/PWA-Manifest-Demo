@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4285f4">
+  <title>您已离线 | 原生PWA示例</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .icon {
+      font-size: 72px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      margin-bottom: 16px;
+      font-size: 24px;
+    }
+    p {
+      margin-bottom: 24px;
+      line-height: 1.5;
+      max-width: 500px;
+    }
+    button {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+    .cached-pages {
+      margin-top: 24px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .cached-pages h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .page-list {
+      list-style: none;
+      padding: 0;
+      text-align: left;
+    }
+    .page-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .page-list a {
+      color: #4285f4;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="icon">📡</div>
+  <h1>您当前处于离线状态</h1>
+  <p>无法连接到网络。您可以访问已缓存的页面，或者在网络恢复后重试。</p>
+  <button onclick="window.location.reload()">重试连接</button>
+  
+  <div class="cached-pages">
+    <h2>可访问的已缓存页面</h2>
+    <ul id="page-list" class="page-list">
+      <!-- 这部分将由JS动态填充 -->
+      <li><a href="/">首页</a></li>
+    </ul>
+  </div>
+
+  <script>
+    // 尝试获取缓存的页面列表
+    if ('caches' in window) {
+      caches.open('pages-cache').then(cache => {
+        cache.keys().then(requests => {
+          const pageList = document.getElementById('page-list');
+          pageList.innerHTML = '';
+          
+          if (requests.length === 0) {
+            pageList.innerHTML = '<li>没有可用的缓存页面</li>';
+            return;
+          }
+          
+          requests.forEach(request => {
+            const url = request.url;
+            const urlObj = new URL(url);
+            const path = urlObj.pathname;
+            
+            // 简单处理路径显示
+            let displayPath = path;
+            if (path === '/' || path === '/index.html') {
+              displayPath = '首页';
+            } else {
+              displayPath = path.replace(/\.html$/, '').replace(/^\//, '');
+              // 首字母大写
+              displayPath = displayPath.charAt(0).toUpperCase() + displayPath.slice(1);
+            }
+            
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = url;
+            a.textContent = displayPath;
+            li.appendChild(a);
+            pageList.appendChild(li);
+          });
+        });
+      });
+    }
+  </script>
+</body>
+</html>
